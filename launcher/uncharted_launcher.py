@@ -129,6 +129,7 @@ ULTRAWIDE = [('auto', 'Fill wide screens (wider view)'),
              ('0', "16:9 with black bars (the games' own)")]
 # The games' field of view in percent (BB_FOV), on every screen.
 FIELDS_OF_VIEW = [('100', "100% (the games' own)"), ('110', '110%'), ('120', '120%'), ('130', '130%')]
+SPEAKERS = [('auto', 'Automatic (the Windows speaker setup)'), ('2', 'Stereo'), ('6', '5.1 surround'), ('8', '7.1 surround')]
 SCALERS = [('fsr1', 'FSR 1 (AMD FidelityFX, sharp)'), ('bilinear', 'Smooth (bilinear)')]
 # The games' depth of field (BB_DOF): Uncharted 2 and 3 blur the background while aiming and in some scenes.
 DEPTH_OF_FIELD = [('1', "On (the games' own)"), ('aim', 'Off only while aiming'), ('0', 'Off everywhere')]
@@ -210,7 +211,7 @@ RESERVED_KEYS = {'Insert': 'Insert opens the in-game settings menu.',
 
 APP_DEFAULTS = {'game_dir': '', 'game_dir_u1': '', 'game_dir_u2': '', 'game_dir_u3': '', 'user_dir': '', 'start': 'u1', 'language': '1', 'ui_language': '', 'player_name': '',
                 'fullscreen': False, 'present_mode': 'Mailbox', 'frame_rate': '60', 'fps_limit': '0', 'show_fps': False, 'bloom': True, 'depth_of_field': '1', 'skip_intro': False, 'job_threads': 'auto', 'unlock_chapters': False, 'prep_unknown_versions': False, 'skip_friends_notice': True, 'anisotropy': '0',
-                'window_size': '1920x1080', 'render_resolution': '1080', 'ultrawide': 'auto', 'fov': '100', 'scaler': 'fsr1', 'sharpening': '500',
+                'window_size': '1920x1080', 'render_resolution': '1080', 'ultrawide': 'auto', 'fov': '100', 'speakers': 'auto', 'scaler': 'fsr1', 'sharpening': '500',
                 'anti_aliasing': 'off', 'dlss_model': 'default', 'aa_sharpness': '0.2', 'frame_generation': 'off',
                 'frame_gen_multiplier': '2', 'extra_env': '', 'close_on_play': False,
                 'shader_preparation': 'before', 'preparation_speed': 'all',
@@ -783,6 +784,8 @@ def game_environment(s, start=None):
     if job_threads != 'auto':
         env['BB_JOB_SLEEP'] = '0' if job_threads == 'spin' else '1'
     env['BB_ANISO'] = str(s.get('anisotropy') or '0')
+    if str(s.get('speakers') or 'auto') != 'auto':
+        env['BB_SPEAKERS'] = str(s['speakers'])
     env['BB_FSR1'] = '1' if s.get('scaler', 'fsr1') == 'fsr1' else '0'
     sharpening = str(s.get('sharpening') or 'off')
     env['BB_RCAS'] = '0' if sharpening == 'off' else '1'
@@ -1790,6 +1793,11 @@ class Launcher:
                  _('FSR 3 makes one frame (2×). DLSS makes up to three on a GeForce RTX 50 (4×), '
                    'one on an RTX 40.'))
         self.check(f, 'show_fps', _('Show the FPS counter'))
+        self.section(f, _('Audio'))
+        self.row(f, _('Speakers'), self.choice(f, 'speakers', SPEAKERS, 34),
+                 _('What the games are told the speakers are, which sets the choices in their Audio Output '
+                   'menu (stereo, 5.1, 7.1). Automatic follows the Windows speaker configuration of the '
+                   'default playback device; set it to 5.1 or 7.1 when the games only offer stereo.'))
 
     def build_controls(self):
         f = self.page('controls', _('Controls'),

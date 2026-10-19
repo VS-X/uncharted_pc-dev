@@ -58,6 +58,7 @@ shader cache and art are never replaced. You can turn the check off in the launc
 ### Convenience
 - **Skip the intro logos** and **skip the friends' stats notice** after Continue / New Game.
 - Keyboard, mouse and controller together, all remappable; button prompts follow what you play with.
+- Stereo, 5.1 or 7.1 sound: the games are told the real speaker layout (it follows the Windows setting, or pick it in the launcher).
 - Trophies (in-game notice and a launcher page), Add to Steam, desktop shortcuts, crash-safe saves.
 
 ## Requirements
